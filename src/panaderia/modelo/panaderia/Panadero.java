@@ -1,17 +1,17 @@
 package panaderia.modelo.panaderia;
 
-import panaderia.modelo.impresor.ArchivoImpresor;
-import panaderia.modelo.impresor.Impresor;
 
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class Panadero {
 
     private int delay;
     private boolean estaOcupado;
     Panaderia panaderia;
-    Impresor logArchivo = new ArchivoImpresor("panaderia.log");
+    Logger logger = Logger.getLogger("panaderia.panadero");
 
     public Panadero(Panaderia panaderia, int delay) {
         this.panaderia = panaderia;
@@ -28,7 +28,7 @@ public class Panadero {
         ScheduledThreadPoolExecutor exec = new ScheduledThreadPoolExecutor(1);
         exec.schedule(new Runnable() {
             public void run() {
-                logArchivo.escribir("Se atendio a " + cliente.toString() + ".");
+                logger.log(Level.INFO, "Se atendio a " + cliente.toString() + ".");
                 estaOcupado = false;
                 Caja.cobrar(cliente);
                 buscarAtender();

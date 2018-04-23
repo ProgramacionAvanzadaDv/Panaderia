@@ -1,16 +1,13 @@
 package panaderia.modelo.panaderia;
 
-import panaderia.modelo.impresor.ArchivoImpresor;
-import panaderia.modelo.impresor.ConsolaImpresor;
-import panaderia.modelo.impresor.Impresor;
-
 import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class Panaderia {
 
     Queue<Cliente> cola = new LinkedList<>();
-    Impresor logArchivo = new ArchivoImpresor("panaderia.log");
-    Impresor logConsola = new ConsolaImpresor();
+    Logger logger = Logger.getLogger("panaderia.modelo.panaderia");
     List<Panadero> panaderos = new ArrayList<>();
 
     public void entroPanadero(Panadero panadero) {
@@ -23,8 +20,8 @@ public class Panaderia {
 
     public void entrar(Cliente cliente) {
         cola.offer(cliente);
-        logConsola.escribir("Bienvenido " + cliente.getNombreCompleto() + ".");
-        logArchivo.escribir(cliente.toString() + " entro al local.");
+        System.out.println("Bienvenido " + cliente.getNombreCompleto() + ".");
+        logger.log(Level.INFO, cliente.toString() + " entro al local.");
         tratarDeAtender();
     }
 
@@ -33,14 +30,14 @@ public class Panaderia {
             if(!panadero.estaOcupado()) {
                 Cliente cliente = cola.poll();
                 if(cliente == null) {
-                    logArchivo.escribir("No hay nadie mas para atender.");
+                    logger.log(Level.WARNING, "No hay nadie mas para atender.");
                     return;
                 }
                 panadero.atender(cliente);
                 return;
             }
         }
-        logArchivo.escribir("Todos los panaderos estan ocupados.");
+        logger.log(Level.WARNING, "Todos los panaderos estan ocupados.");
     }
 
     public Queue<Cliente> enEspera() {
@@ -48,7 +45,7 @@ public class Panaderia {
     }
 
     public void abrir() {
-        logArchivo.escribir("La Panaderia abrio.");
+        logger.log(Level.INFO, "La Panaderia abrio.");
         entroPanadero(new Panadero(this,5));
         entroPanadero(new Panadero(this,2));
         esperarClientes();
@@ -57,11 +54,11 @@ public class Panaderia {
     private void esperarClientes() {
         Scanner sc = new Scanner(System.in).useLocale(Locale.US);
         while(true) {
-            logConsola.escribir("Ingrese su nombre y apellido");
+            System.out.println("Ingrese su nombre y apellido");
             String nombreCompleto = sc.next();
-            logConsola.escribir("Ingrese su dni");
+            System.out.println("Ingrese su dni");
             int dni = sc.nextInt();
-            logConsola.escribir("Ingrese su pago");
+            System.out.println("Ingrese su pago");
             double pago = sc.nextDouble();
             Cliente cliente = new Cliente(nombreCompleto, dni, pago);
             entrar(cliente);
@@ -70,7 +67,7 @@ public class Panaderia {
     }
 
     public void cerrar() {
-        logArchivo.escribir("La Panaderia cerro.");
+        logger.log(Level.INFO, "La Panaderia cerro.");
         for(Panadero panadero : panaderos) {
             salioPanadero(panadero);
         }
